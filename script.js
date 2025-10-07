@@ -53,3 +53,11 @@ function getCuaca() {
     },
   });
 }
+
+document
+  .getElementById("lokasiInput")
+  .addEventListener("keypress", function (e) {
+    if (e.key === "Enter") {
+      getCuaca();
+    }
+  });
