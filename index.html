@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cuaca Hari Ini</title>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+      integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background: linear-gradient(135deg, #74b9ff, #0984e3);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        color: #333;
+      }
+
+      .container {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        max-width: 500px;
+        padding: 30px;
+        text-align: center;
+      }
+
+      h1 {
+        color: #0984e3;
+        margin-bottom: 20px;
+        font-size: 28px;
+      }
+
+      .input-group {
+        margin-bottom: 20px;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        font-size: 16px;
+        outline: none;
+        transition: border-color 0.3s;
+      }
+
+      input[type="text"]:focus {
+        border-color: #74b9ff;
+      }
+
+      button {
+        background: #0984e3;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        font-size: 16px;
+        border-radius: 10px;
+        cursor: pointer;
+        width: 100%;
+        transition: background 0.3s;
+      }
+
+      button:hover {
+        background: #0767b3;
+      }
+
+      .result {
+        margin-top: 25px;
+        text-align: left;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        display: none;
+      }
+
+      .result h2 {
+        color: #0984e3;
+        margin-bottom: 15px;
+        font-size: 20px;
+      }
+
+      .info-item {
+        margin: 8px 0;
+        font-size: 16px;
+      }
+
+      .info-label {
+        font-weight: bold;
+        color: #2d3436;
+      }
+
+      .error {
+        color: #e17055;
+        margin-top: 15px;
+        font-weight: bold;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🌤️ Cuaca Hari Ini</h1>
+
+      <div class="input-group">
+        <input
+          type="text"
+          id="lokasiInput"
+          placeholder="Masukkan kota, misal: Yogyakarta atau -7.8,110.3"
+        />
+      </div>
+
+      <button id="getCuaca">Get Cuaca</button>
+
+      <div class="error" id="errorMessage"></div>
+
+      <div class="result" id="result">
+        <h2>📊 Informasi Cuaca</h2>
+        <div class="info-item">
+          <span class="info-label">Lokasi:</span> <span id="namaKota"></span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Negara:</span> <span id="negara"></span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Provinsi:</span> <span id="provinsi"></span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Latitude:</span> <span id="latitude"></span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Longitude:</span>
+          <span id="longitude"></span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Suhu:</span> <span id="suhu"></span> °C
+        </div>
+        <div class="info-item">
+          <span class="info-label">Kelembaban:</span>
+          <span id="kelembaban"></span> %
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_KEY = "13c646f3661f451abae20558250710"; // 🔑 GANTI DENGAN API KEY ANDA
+
+      document.getElementById("getCuaca").addEventListener("click", getCuaca);
+
+      function getCuaca() {
+        const input = document.getElementById("lokasiInput").value.trim();
+        const errorEl = document.getElementById("errorMessage");
+        const resultEl = document.getElementById("result");
+
+        // Reset tampilan
+        errorEl.style.display = "none";
+        resultEl.style.display = "none";
+
+        if (!input) {
+          errorEl.textContent = "⚠️ Silakan masukkan lokasi!";
+          errorEl.style.display = "block";
+          return;
+        }
+
+        const url = `http://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${encodeURIComponent(
+          input
+        )}&aqi=no`;
+
+        $.ajax({
+          url: url,
+          method: "GET",
+          success: function (data) {
+            // Isi data
+            document.getElementById("namaKota").textContent =
+              data.location.name || "–";
+            document.getElementById("negara").textContent =
+              data.location.country || "–";
+            document.getElementById("provinsi").textContent =
+              data.location.region || "–";
+            document.getElementById("latitude").textContent =
+              data.location.lat || "–";
+            document.getElementById("longitude").textContent =
+              data.location.lon || "–";
+            document.getElementById("suhu").textContent =
+              data.current.temp_c || "–";
+            document.getElementById("kelembaban").textContent =
+              data.current.humidity || "–";
+
+            resultEl.style.display = "block";
+          },
+          error: function (xhr, status, error) {
+            let msg = "❌ Gagal mengambil data cuaca.";
+            if (xhr.status === 400) {
+              msg = "📍 Lokasi tidak ditemukan. Coba nama kota yang valid.";
+            } else if (xhr.status === 401 || xhr.status === 403) {
+              msg = "🔑 API Key tidak valid. Periksa kunci API Anda.";
+            }
+            errorEl.textContent = msg;
+            errorEl.style.display = "block";
+          },
+        });
+      }
+
+      // Tekan Enter untuk submit
+      document
+        .getElementById("lokasiInput")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            getCuaca();
+          }
+        });
+    </script>
+  </body>
+</html>
